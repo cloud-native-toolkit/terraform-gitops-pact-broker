@@ -58,7 +58,7 @@ CONFIG_PROJECT=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".project')
 CONFIG_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${CONFIG_REPO}" -r 'select(.repo == $REPO) | .token')
 
 echo "Setting up payload gitops"
-TOKEN="${PAYLOAD_TOKEN}" "${SCRIPT_DIR}/setup-applications.sh" "${NAME}" "${PAYLOAD_REPO}" "${PAYLOAD_PATH}" "${NAMESPACE}" "${CONTENT_DIR}"
+TOKEN="${PAYLOAD_TOKEN}" "${SCRIPT_DIR}/setup-application.sh" "${NAME}" "${PAYLOAD_REPO}" "${PAYLOAD_PATH}" "${NAMESPACE}" "${CONTENT_DIR}"
 
 echo "Setting up argocd config"
 TOKEN="${CONFIG_TOKEN}" "${SCRIPT_DIR}/setup-argocd.sh" "${NAME}" "${CONFIG_REPO}" "${CONFIG_PATH}" "${CONFIG_PROJECT}" "${PAYLOAD_REPO}" "${PAYLOAD_PATH}" "${NAMESPACE}" "${APPLICATION_BRANCH}"
