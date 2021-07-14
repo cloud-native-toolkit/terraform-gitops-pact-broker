@@ -17,6 +17,8 @@ if [[ -z "${JQ}" ]]; then
   JQ="${PWD}/bin/jq"
 fi
 
+${JQ} --version
+
 SEMAPHORE="${REPO//\//-}.semaphore"
 SEMAPHORE_ID="${SCRIPT_DIR//\//-}"
 
