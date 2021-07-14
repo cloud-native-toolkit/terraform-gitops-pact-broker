@@ -17,8 +17,6 @@ if [[ -z "${JQ}" ]]; then
   JQ="${PWD}/bin/jq"
 fi
 
-${JQ} --version
-
 SEMAPHORE="${REPO//\//-}.semaphore"
 SEMAPHORE_ID="${SCRIPT_DIR//\//-}"
 
@@ -43,6 +41,10 @@ function finish {
 }
 
 trap finish EXIT
+
+${JQ} --version
+
+echo "Gitops config: ${GITOPS_CONFIG}"
 
 PAYLOAD_REPO=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.payload.repo')
 
