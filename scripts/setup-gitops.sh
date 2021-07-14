@@ -44,23 +44,28 @@ trap finish EXIT
 
 ${JQ} --version
 
-echo "Gitops config: ${GITOPS_CONFIG}"
-echo "${GITOPS_CONFIG}" | ${JQ} '.'
-echo "${GITOPS_CONFIG}" | ${JQ} '.payload'
-echo "${GITOPS_CONFIG}" | ${JQ} -r '.payload.repo'
-
 PAYLOAD_REPO=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.payload.repo')
 
 PAYLOAD_BASE_PATH=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.payload.path')
 PAYLOAD_PATH="${PAYLOAD_BASE_PATH}/${APPLICATION_PATH}"
 
-PAYLOAD_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${PAYLOAD_REPO}" -r 'select(.repo == $REPO) | .token')
+PAYLOAD_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${PAYLOAD_REPO}" -r '.[] | select(.repo == $REPO) | .token')
 
 CONFIG_REPO=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".repo')
 CONFIG_PATH=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".path')
 CONFIG_PROJECT=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".project')
 
-CONFIG_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${CONFIG_REPO}" -r 'select(.repo == $REPO) | .token')
+CONFIG_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${CONFIG_REPO}" -r '.[] | select(.repo == $REPO) | .token')
+
+if [[ -z "${PAYLOAD_TOKEN}" ]]; then
+  echo "Git token not found for repo: ${PAYLOAD_REPO}"
+  exit 1
+fi
+
+if [[ -z "${CONFIG_TOKEN}" ]]; then
+  echo "Git token not found for repo: ${CONFIG_REPO}"
+  exit 1
+fi
 
 echo "Setting up payload gitops"
 TOKEN="${PAYLOAD_TOKEN}" "${SCRIPT_DIR}/setup-application.sh" "${NAME}" "${PAYLOAD_REPO}" "${PAYLOAD_PATH}" "${NAMESPACE}" "${CONTENT_DIR}"
