@@ -49,9 +49,9 @@ PAYLOAD_PATH="${PAYLOAD_BASE_PATH}/${APPLICATION_PATH}"
 
 PAYLOAD_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${PAYLOAD_REPO}" -r 'select(.repo == $REPO) | .token')
 
-CONFIG_REPO=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.argocd\-config.repo')
-CONFIG_PATH=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.argocd\-config.path')
-CONFIG_PROJECT=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '.argocd\-config.project')
+CONFIG_REPO=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".repo')
+CONFIG_PATH=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".path')
+CONFIG_PROJECT=$(echo "${GITOPS_CONFIG}" | ${JQ} -r '."argocd-config".project')
 
 CONFIG_TOKEN=$(echo "${GIT_CREDENTIALS}" | ${JQ} --arg REPO "${CONFIG_REPO}" -r 'select(.repo == $REPO) | .token')
 
