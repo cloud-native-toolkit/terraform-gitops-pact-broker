@@ -43,7 +43,11 @@ locals {
 
 resource null_resource setup_chart {
   provisioner "local-exec" {
-    command = "mkdir -p ${local.chart_dir} && cp -R ${path.module}/chart/pact-broker/* ${local.chart_dir} && echo '${yamlencode(local.values_content)}' > ${local.chart_dir}/values.yaml"
+    command = "${path.module}/scripts/create-yaml.sh '${local.chart_dir}'"
+
+    environment = {
+      VALUES_CONTENT = yamlencode(local.values_content)
+    }
   }
 }
 
