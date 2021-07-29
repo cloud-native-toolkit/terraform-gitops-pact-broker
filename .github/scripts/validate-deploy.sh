@@ -49,7 +49,7 @@ else
   sleep 30
 fi
 
-DEPLOYMENT="pact-broker"
+DEPLOYMENT="pact-broker-${NAMESPACE}"
 count=0
 until kubectl get deployment "${DEPLOYMENT}" "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
   echo "Waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
