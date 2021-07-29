@@ -5,6 +5,7 @@ GIT_TOKEN=$(cat git_token)
 
 export KUBECONFIG=$(cat .kubeconfig)
 NAMESPACE=$(cat .namespace)
+BRANCH="main"
 
 mkdir -p .testrepo
 
@@ -49,7 +50,7 @@ else
   sleep 30
 fi
 
-DEPLOYMENT="pact-broker-${NAMESPACE}"
+DEPLOYMENT="pact-broker-${BRANCH}"
 count=0
 until kubectl get deployment "${DEPLOYMENT}" "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
   echo "Waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
