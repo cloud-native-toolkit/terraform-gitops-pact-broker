@@ -52,7 +52,7 @@ fi
 
 DEPLOYMENT="pact-broker-${BRANCH}"
 count=0
-until kubectl get deployment "${DEPLOYMENT}" "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
+until kubectl get deployment "${DEPLOYMENT}" -n "${NAMESPACE}" || [[ $count -eq 20 ]]; do
   echo "Waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
   count=$((count + 1))
   sleep 15
@@ -64,7 +64,7 @@ if [[ $count -eq 20 ]]; then
   exit 1
 fi
 
-kubectl get "deployment/${DEPLOYMENT}" -n "${NAMESPACE}" || exit 1
+kubectl rollout status "deployment/${DEPLOYMENT}" -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
