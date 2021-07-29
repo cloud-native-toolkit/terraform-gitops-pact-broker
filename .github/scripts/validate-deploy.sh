@@ -3,6 +3,9 @@
 GIT_REPO=$(cat git_repo)
 GIT_TOKEN=$(cat git_token)
 
+export KUBECONFIG=$(cat .kubeconfig)
+NAMESPACE=$(cat .namespace)
+
 mkdir -p .testrepo
 
 git clone https://${GIT_TOKEN}@${GIT_REPO} .testrepo
@@ -28,6 +31,8 @@ else
 fi
 
 cat payload/2-services/pact-broker/values.yaml
+
+kubectl get deployment pact-broker -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
