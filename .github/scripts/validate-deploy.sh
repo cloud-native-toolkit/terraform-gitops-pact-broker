@@ -21,6 +21,7 @@ else
   echo "ArgoCD config found"
 fi
 
+echo "Printing argocd/2-services/active/pact-broker.yaml"
 cat argocd/2-services/active/pact-broker.yaml
 
 if [[ ! -f "payload/2-services/pact-broker/values.yaml" ]]; then
@@ -30,8 +31,8 @@ else
   echo "Application values found"
 fi
 
+echo "Printing payload/2-services/pact-broker/values.yaml"
 cat payload/2-services/pact-broker/values.yaml
-
 
 count=0
 until kubectl get namespace "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
@@ -48,8 +49,21 @@ else
   sleep 30
 fi
 
+DEPLOYMENT="pact-broker"
+count=0
+until kubectl get deployment "${DEPLOYMENT}" "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
+  echo "Waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
+  count=$((count + 1))
+  sleep 15
+done
+
+if [[ $count -eq 20 ]]; then
+  echo "Timed out waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
+  exit 1
+fi
+
 kubectl get all -n "${NAMESPACE}"
-kubectl get deployment pact-broker -n "${NAMESPACE}" || exit 1
+kubectl get "deployment/${DEPLOYMENT}" -n "${NAMESPACE}" || exit 1
 
 cd ..
 rm -rf .testrepo
