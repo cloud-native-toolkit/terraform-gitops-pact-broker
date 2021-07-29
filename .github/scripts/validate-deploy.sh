@@ -59,10 +59,10 @@ done
 
 if [[ $count -eq 20 ]]; then
   echo "Timed out waiting for deployment/${DEPLOYMENT} in ${NAMESPACE}"
+  kubectl get all -n "${NAMESPACE}"
   exit 1
 fi
 
-kubectl get all -n "${NAMESPACE}"
 kubectl get "deployment/${DEPLOYMENT}" -n "${NAMESPACE}" || exit 1
 
 cd ..
