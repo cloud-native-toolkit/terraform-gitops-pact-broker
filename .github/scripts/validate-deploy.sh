@@ -32,6 +32,23 @@ fi
 
 cat payload/2-services/pact-broker/values.yaml
 
+
+count=0
+until kubectl get namespace "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
+  echo "Waiting for namespace: ${NAMESPACE}"
+  count=$((count + 1))
+  sleep 15
+done
+
+if [[ $count -eq 20 ]]; then
+  echo "Timed out waiting for namespace: ${NAMESPACE}"
+  exit 1
+else
+  echo "Found namespace: ${NAMESPACE}. Sleeping for 30 seconds to wait for everything to settle down"
+  sleep 30
+fi
+
+kubectl get all -n "${NAMESPACE}"
 kubectl get deployment pact-broker -n "${NAMESPACE}" || exit 1
 
 cd ..
