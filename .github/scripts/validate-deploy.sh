@@ -25,13 +25,13 @@ fi
 echo "Printing argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml"
 cat "argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml"
 
-if [[ ! -f "payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml" ]]; then
-  echo "Application values not found - payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
+if [[ ! -f "payload/2-services/namespace/${NAMESPACE}/${NAME}/values-${SERVER_NAME}.yaml" ]]; then
+  echo "Application values not found - payload/2-services/namespace/${NAMESPACE}/${NAME}/values-${SERVER_NAME}.yaml"
   exit 1
 fi
 
 echo "Printing payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
-cat "payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
+cat "payload/2-services/namespace/${NAMESPACE}/${NAME}/values-${SERVER_NAME}.yaml"
 
 count=0
 until kubectl get namespace "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
