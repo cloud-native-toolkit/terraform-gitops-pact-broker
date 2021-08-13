@@ -1,5 +1,6 @@
 locals {
-  chart_dir = "${path.cwd}/.tmp/pact-broker/chart/pact-broker"
+  bin_dir = "${path.cwd}/bin"
+  yaml_dir = "${path.cwd}/.tmp/pact-broker/chart/pact-broker"
   ingress_host  = "pact-broker-${var.namespace}.${var.cluster_ingress_hostname}"
   database_type = "sqlite"
   database_name = "pactbroker.sqlite"
@@ -37,13 +38,23 @@ locals {
     }
   }
   layer = "services"
-  application_branch = "main"
-  layer_config = var.gitops_config[local.layer]
+  values_file = "values-${var.server_name}.yaml"
+  name = "pact-broker"
 }
 
-resource null_resource setup_chart {
+resource null_resource setup_binaries {
   provisioner "local-exec" {
-    command = "${path.module}/scripts/create-yaml.sh '${local.chart_dir}'"
+    command = "${path.module}/scripts/setup-binaries.sh"
+
+    environment = {
+      BIN_DIR = local.bin_dir
+    }
+  }
+}
+
+resource null_resource create_yaml {
+  provisioner "local-exec" {
+    command = "${path.module}/scripts/create-yaml.sh '${local.yaml_dir}' '${local.values_file}'"
 
     environment = {
       VALUES_CONTENT = yamlencode(local.values_content)
@@ -52,14 +63,14 @@ resource null_resource setup_chart {
 }
 
 resource null_resource setup_gitops {
-  depends_on = [null_resource.setup_chart]
+  depends_on = [null_resource.create_yaml]
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/setup-gitops.sh 'pact-broker' '${local.chart_dir}' 'pact-broker' '${local.application_branch}' '${var.namespace}'"
+    command = "$(command -v igc || command -v ${local.bin_dir}/igc) gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --valueFiles 'values.yaml,${local.values_file}' --debug"
 
     environment = {
-      GIT_CREDENTIALS = jsonencode(var.git_credentials)
-      GITOPS_CONFIG = jsonencode(local.layer_config)
+      GIT_CREDENTIALS = yamlencode(var.git_credentials)
+      GITOPS_CONFIG   = yamlencode(var.gitops_config)
     }
   }
 }

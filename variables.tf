@@ -82,3 +82,9 @@ variable "tls_secret_name" {
   description = "The name of the secret containing the tls certificate values"
   default     = ""
 }
+
+variable "server_name" {
+  type        = string
+  description = "The cluster where the application will be provisioned"
+  default     = "default"
+}
