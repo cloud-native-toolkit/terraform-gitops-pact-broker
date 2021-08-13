@@ -6,6 +6,8 @@ GIT_TOKEN=$(cat git_token)
 export KUBECONFIG=$(cat .kubeconfig)
 NAMESPACE=$(cat .namespace)
 BRANCH="main"
+SERVER_NAME="default"
+NAME="pact-broker"
 
 mkdir -p .testrepo
 
@@ -15,25 +17,21 @@ cd .testrepo || exit 1
 
 find . -name "*"
 
-if [[ ! -f "argocd/2-services/active/pact-broker.yaml" ]]; then
-  echo "ArgoCD config missing"
+if [[ ! -f "argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml" ]]; then
+  echo "ArgoCD config missing - argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml"
   exit 1
-else
-  echo "ArgoCD config found"
 fi
 
-echo "Printing argocd/2-services/active/pact-broker.yaml"
-cat argocd/2-services/active/pact-broker.yaml
+echo "Printing argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml"
+cat "argocd/2-services/cluster/${SERVER_NAME}/base/${NAMESPACE}-${NAME}.yaml"
 
-if [[ ! -f "payload/2-services/pact-broker/values.yaml" ]]; then
-  echo "Application values not found"
+if [[ ! -f "payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml" ]]; then
+  echo "Application values not found - payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
   exit 1
-else
-  echo "Application values found"
 fi
 
-echo "Printing payload/2-services/pact-broker/values.yaml"
-cat payload/2-services/pact-broker/values.yaml
+echo "Printing payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
+cat "payload/2-services/namespace/${NAMESPACE}/pact-broker/values-${SERVER_NAME}.yaml"
 
 count=0
 until kubectl get namespace "${NAMESPACE}" 1> /dev/null 2> /dev/null || [[ $count -eq 20 ]]; do
