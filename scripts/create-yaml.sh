@@ -11,7 +11,11 @@ mkdir -p "${DEST_DIR}"
 cp -R "${MODULE_DIR}/chart/pact-broker/"* "${DEST_DIR}"
 
 if [[ -n "${VALUES_CONTENT}" ]]; then
-  echo "${VALUES_CONTENT}" > "${DEST_DIR}/${VALUES_FILE}"
+  echo "${VALUES_CONTENT}" > "${DEST_DIR}/values.yaml"
+fi
+
+if [[ -n "${VALUES_SERVER_CONTENT}" ]] && [[ -n "${VALUES_FILE}" ]]; then
+  echo "${VALUES_SERVER_CONTENT}" > "${DEST_DIR}/${VALUES_FILE}"
 fi
 
 find "${DEST_DIR}" -name "*"
