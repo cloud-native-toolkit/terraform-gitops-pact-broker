@@ -1,5 +1,5 @@
 locals {
-  bin_dir = "${path.cwd}/bin"
+  bin_dir  = module.setup_clis.bin_dir
   yaml_dir = "${path.cwd}/.tmp/pact-broker/chart/pact-broker"
   ingress_host  = "pact-broker-${var.namespace}.${var.cluster_ingress_hostname}"
   database_type = "sqlite"
@@ -69,14 +69,8 @@ locals {
   name = "pact-broker"
 }
 
-resource null_resource setup_binaries {
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/setup-binaries.sh"
-
-    environment = {
-      BIN_DIR = local.bin_dir
-    }
-  }
+module setup_clis {
+  source = "github.com/cloud-native-toolkit/terraform-util-clis.git"
 }
 
 resource null_resource create_yaml {
@@ -94,7 +88,7 @@ resource null_resource setup_gitops {
   depends_on = [null_resource.create_yaml]
 
   provisioner "local-exec" {
-    command = "$(command -v igc || command -v ${local.bin_dir}/igc) gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --valueFiles 'values.yaml,${local.values_file}' --debug"
+    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --valueFiles 'values.yaml,${local.values_file}'"
 
     environment = {
       GIT_CREDENTIALS = yamlencode(var.git_credentials)
