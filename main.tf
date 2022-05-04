@@ -8,6 +8,7 @@ locals {
   ingress_url   = "https://${local.ingress_host}"
   service_url  = "http://${local.service_name}.${var.namespace}"
   type  = "base"
+  application_branch = "main"
   values_content = {
     pact-broker = {
       ingress = {
