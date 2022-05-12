@@ -7,6 +7,8 @@ locals {
   service_name  = "pact-broker"
   ingress_url   = "https://${local.ingress_host}"
   service_url  = "http://${local.service_name}.${var.namespace}"
+  type  = "base"
+  application_branch = "main"
   values_content = {
     pact-broker = {
       ingress = {
@@ -87,12 +89,35 @@ resource null_resource create_yaml {
 resource null_resource setup_gitops {
   depends_on = [null_resource.create_yaml]
 
+  triggers = {
+    name = local.name
+    namespace = var.namespace
+    yaml_dir = local.yaml_dir
+    server_name = var.server_name
+    layer = local.layer
+    type = local.type
+    git_credentials = yamlencode(var.git_credentials)
+    gitops_config   = yamlencode(var.gitops_config)
+    bin_dir = local.bin_dir
+  }
+
   provisioner "local-exec" {
-    command = "${local.bin_dir}/igc gitops-module '${local.name}' -n '${var.namespace}' --contentDir '${local.yaml_dir}' --serverName '${var.server_name}' -l '${local.layer}' --valueFiles 'values.yaml,${local.values_file}'"
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
 
     environment = {
-      GIT_CREDENTIALS = nonsensitive(yamlencode(var.git_credentials))
-      GITOPS_CONFIG   = yamlencode(var.gitops_config)
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
+    }
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+    command = "${self.triggers.bin_dir}/igc gitops-module '${self.triggers.name}' -n '${self.triggers.namespace}' --delete --contentDir '${self.triggers.yaml_dir}' --serverName '${self.triggers.server_name}' -l '${self.triggers.layer}' --type '${self.triggers.type}'"
+
+    environment = {
+      GIT_CREDENTIALS = nonsensitive(self.triggers.git_credentials)
+      GITOPS_CONFIG   = self.triggers.gitops_config
     }
   }
 }
+
