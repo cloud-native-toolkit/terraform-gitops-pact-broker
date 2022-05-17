@@ -15,7 +15,7 @@ locals {
         enabled = false
       }
       route = {
-        enabled = true
+        enabled = false
       }
       database = {
         type = local.database_type
