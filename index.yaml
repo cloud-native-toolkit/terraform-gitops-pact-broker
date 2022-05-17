@@ -16,7 +16,7 @@ versions:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: '>= 1.1.0'
+            version: ">= 1.1.0"
       - id: cluster
         refs: []
         optional: true
@@ -24,9 +24,12 @@ versions:
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-            version: '>= 1.0.0'
+            version: ">= 1.0.0"
     variables:
       - name: gitops_config
+        moduleRef:
+          id: gitops
+          output: gitops_config
         type: |-
           object({
               boostrap = object({
@@ -78,10 +81,10 @@ versions:
               })
             })
         description: Config information regarding the gitops repo structure
+      - name: git_credentials
         moduleRef:
           id: gitops
-          output: gitops_config
-      - name: git_credentials
+          output: git_credentials
         type: |-
           list(object({
               repo = string
@@ -90,43 +93,44 @@ versions:
               token = string
             }))
         description: The credentials for the gitops repo(s)
-        moduleRef:
-          id: gitops
-          output: git_credentials
-      - name: namespace
-        type: string
-        description: The namespace where the application should be deployed
-        moduleRef:
-          id: namespace
-          output: name
-      - name: cluster_ingress_hostname
-        type: string
-        description: Ingress hostname of the IKS cluster.
-        default: ''
-        moduleRef:
-          id: cluster
-          output: platform.ingress
-      - name: cluster_type
-        type: string
-        description: The cluster type (openshift or ocp3 or ocp4 or kubernetes)
-        default: ocp4
-        moduleRef:
-          id: cluster
-          output: platform.type_code
-      - name: tls_secret_name
-        type: string
-        description: The name of the secret containing the tls certificate values
-        default: ''
-        moduleRef:
-          id: cluster
-          output: platform.tls_secret
       - name: server_name
-        type: string
-        description: The cluster where the application will be provisioned
-        default: default
         moduleRef:
           id: gitops
           output: server_name
+        type: string
+        description: The cluster where the application will be provisioned
+        default: default
+        optional: true
+      - name: cluster_type
+        moduleRef:
+          id: cluster
+          output: platform.type_code
+        type: string
+        description: The cluster type (openshift or ocp3 or ocp4 or kubernetes)
+        default: ocp4
+        optional: true
+      - name: cluster_ingress_hostname
+        moduleRef:
+          id: cluster
+          output: platform.ingress
+        type: string
+        description: Ingress hostname of the IKS cluster.
+        default: ""
+        optional: true
+      - name: tls_secret_name
+        moduleRef:
+          id: cluster
+          output: platform.tls_secret
+        type: string
+        description: The name of the secret containing the tls certificate values
+        default: ""
+        optional: true
+      - name: namespace
+        moduleRef:
+          id: namespace
+          output: name
+        type: string
+        description: The namespace where the application should be deployed
     version: v1.1.5
     outputs:
       - name: name
@@ -149,7 +153,7 @@ versions:
       - id: gitops
         refs:
           - source: github.com/cloud-native-toolkit/terraform-tools-gitops.git
-            version: '>= 1.1.0'
+            version: ">= 1.1.0"
       - id: cluster
         refs: []
         optional: true
@@ -157,7 +161,7 @@ versions:
       - id: namespace
         refs:
           - source: github.com/cloud-native-toolkit/terraform-gitops-namespace.git
-            version: '>= 1.0.0'
+            version: ">= 1.0.0"
     variables:
       - name: gitops_config
         moduleRef:
@@ -248,7 +252,7 @@ versions:
           output: platform.ingress
         type: string
         description: Ingress hostname of the IKS cluster.
-        default: ''
+        default: ""
         optional: true
       - name: tls_secret_name
         moduleRef:
@@ -256,7 +260,7 @@ versions:
           output: platform.tls_secret
         type: string
         description: The name of the secret containing the tls certificate values
-        default: ''
+        default: ""
         optional: true
       - name: namespace
         moduleRef:
