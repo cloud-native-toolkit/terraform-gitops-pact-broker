@@ -15,7 +15,7 @@ locals {
         enabled = false
       }
       route = {
-        enabled = true
+        enabled = false
       }
       database = {
         type = local.database_type
@@ -23,13 +23,13 @@ locals {
       }
     }
     tool-config = {
-      name = "pactbroker"
+      name = "pact-broker"
       privateUrl = local.service_url
     }
     ocp-route       = {
-      nameOverride = "pactbroker"
+      nameOverride = "pact-broker"
       targetPort = "http"
-      app = "pactbroker"
+      app = "pact-broker"
       serviceName = local.service_name
       termination = "edge"
       insecurePolicy = "Redirect"
