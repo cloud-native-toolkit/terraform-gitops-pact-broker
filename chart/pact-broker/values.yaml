@@ -5,7 +5,7 @@ pact-broker:
 
   image:
     repository: pactfoundation/pact-broker
-    tag: 2.50.1-1
+    tag: 2.101.0.0
     pullPolicy: IfNotPresent
     port: 9292
 
